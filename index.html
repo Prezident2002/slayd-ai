@@ -122,7 +122,9 @@ $("#v").innerHTML=`<div class="sc"><div class="card"><div style="font-size:34px"
 <div class="note" id="dt" style="text-align:left"></div></div><button class="btn" id="nx">Davom etish →</button></div>`;
 const up=()=>{S.f.univ=$("#un").value;S.f.fac=$("#fc").value;S.f.dir=$("#dr2").value;const u=nm(S.f.univ+" "+S.f.fac+" "+S.f.dir),m=TPL.filter(x=>UK[x.id].test(u)).map(x=>x.n);$("#dt").innerHTML=m.length?"🎯 Aniqlangan yo‘nalish: <b>"+m.slice(0,3).join(", ")+"</b>":"💡 Yo‘nalish mavzu bo‘yicha ham aniqlanadi"};
 ["#un","#fc","#dr2"].forEach(q=>$(q).oninput=up);up();
-$("#nx").onclick=()=>{if(S.f.univ.trim().split(/\s+/).length<2){$("#un").focus();return}go(0)}}
+$("#nx").onclick=continueFromUniversity;
+$("#nx").addEventListener("touchend",e=>{e.preventDefault();continueFromUniversity()},{passive:false});
+setTelegramContinueButton(true)}
 const PLAN={uz:["Kirish","Asosiy tushunchalar va nazariy asoslar","Hozirgi holati va tahlil","Muammolar, rivojlanish istiqbollari","Xulosa","Foydalanilgan adabiyotlar"],
 ru:["Введение","Основные понятия и теоретические основы","Современное состояние и анализ","Проблемы и перспективы развития","Заключение","Список литературы"],
 en:["Introduction","Core concepts and theoretical foundations","Current state and analysis","Challenges and future prospects","Conclusion","References"]};
@@ -137,7 +139,10 @@ else if(k==1)b=`<em>01 · ${esc(PLAN[S.lang][1])}</em><s></s><s style="width:38%
 else b=`<em class="st2" style="font-size:30px;color:${t.ac}">87%</em><small>${esc(PLAN[S.lang][2])}</small><s></s>`;
 return `<div class="sl v${t.v||0}" style="--bg2:${t.bg};--ac:${t.ac};--ff:${t.ff}">${b}</div>`}
 function head(){$("#st").innerHTML=[-1,0,1,2,3].map(i=>`<i class="${i<=S.step?'on':''}"></i>`).join("")}
-function go(n){S.step=n;draw();scrollTo({top:0,behavior:"smooth"})}
+function continueFromUniversity(){const univ=$("#un");if(!univ)return;S.f.univ=univ.value;S.f.fac=$("#fc").value;S.f.dir=$("#dr2").value;if(S.f.univ.trim().split(/\s+/).length<2){univ.focus();return}go(0)}
+function setTelegramContinueButton(show){if(!tg||!tg.MainButton)return;try{if(show){tg.MainButton.setText("Davom etish →");tg.MainButton.show()}else tg.MainButton.hide()}catch(e){}}
+if(tg&&tg.MainButton){try{tg.MainButton.onClick(()=>{if(S.step===-1)continueFromUniversity()})}catch(e){}}
+function go(n){S.step=n;draw();setTelegramContinueButton(n===-1);scrollTo({top:0,behavior:"smooth"})}
 function draw(){head();([su,s0,s1,s2,s3][S.step+1])()}
 function s0(){
 $("#v").innerHTML=`<div class="sc"><div class="card"><label>1 · Mavzu</label>
