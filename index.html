@@ -7,6 +7,7 @@
 :root{--bg:#07060f;--card:rgba(255,255,255,.07);--line:rgba(255,255,255,.14);--tx:#f4f2ff;--mut:#a9a4c9;--a:#8b5cf6;--b:#22d3ee;--c:#f472b6;--d:#a3e635;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box;margin:0}html,body{min-height:100%}
 body{background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:hidden}
+button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .orb{position:fixed;border-radius:50%;filter:blur(70px);opacity:.55;z-index:0;animation:fl 14s ease-in-out infinite alternate}
 .o1{width:300px;height:300px;background:var(--a);top:-80px;left:-80px}.o2{width:280px;height:280px;background:var(--b);bottom:-60px;right:-90px;animation-delay:-5s}.o3{width:220px;height:220px;background:var(--c);top:45%;left:55%;animation-delay:-9s;opacity:.35}
 @keyframes fl{to{transform:translate(60px,70px) scale(1.25)}}
@@ -58,8 +59,9 @@ textarea{min-height:84px;resize:none}
 .ld{text-align:center;padding:30px 10px}.ring{width:92px;height:92px;margin:0 auto 18px;border-radius:50%;border:6px solid var(--line);border-top-color:var(--b);border-right-color:var(--c);animation:sp 1s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}.ld p{color:var(--mut);min-height:22px}
 .bar{height:8px;background:var(--line);border-radius:9px;margin-top:16px;overflow:hidden}.bar div{height:100%;width:0;background:linear-gradient(90deg,var(--b),var(--c));transition:width .5s}
-.note{font-size:12px;color:var(--mut);text-align:center;margin-top:14px;line-height:1.5}
+.note{font-size:12px;color:var(--mut);text-align:center;margin-top:14px;line-height:1.5}.err{display:none;color:#fecaca;font-size:13px;margin:10px 2px 0;line-height:1.4}.err.show{display:block}
 .ok{font-size:54px;text-align:center;animation:pl 1.2s 2}
+@media(max-width:600px){.app{padding:14px 14px 28px}h1{font-size:26px}.sub{margin:4px 0 12px}.steps{margin:10px 0 13px}.card{border-radius:16px;padding:14px;margin-bottom:10px}label{margin:10px 0 5px}input,textarea{padding:11px 12px;border-radius:12px}.btn{padding:14px;border-radius:15px}.note{margin-top:10px}}
 </style></head><body>
 <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
 <div class="app">
@@ -119,10 +121,11 @@ $("#v").innerHTML=`<div class="sc"><div class="card"><div style="font-size:34px"
 <label>Universitet / OTM (to‘liq nomi)</label><input id="un" list="ul" value="${esc(S.f.univ)}" placeholder="Masalan: Toshkent davlat iqtisodiyot universiteti"><datalist id="ul">${UN.map(u=>`<option value="${u}">`).join("")}</datalist>
 <label>Fakultet</label><input id="fc" value="${esc(S.f.fac)}" placeholder="Fakultet nomi">
 <label>Ta’lim yo‘nalishi</label><input id="dr2" value="${esc(S.f.dir)}" placeholder="Masalan: Menejment">
-<div class="note" id="dt" style="text-align:left"></div></div><button class="btn" id="nx">Davom etish →</button></div>`;
+<div class="note" id="dt" style="text-align:left"></div><p class="err" id="er" role="alert"></p></div><button class="btn" id="nx" type="button">Davom etish →</button></div>`;
 const up=()=>{S.f.univ=$("#un").value;S.f.fac=$("#fc").value;S.f.dir=$("#dr2").value;const u=nm(S.f.univ+" "+S.f.fac+" "+S.f.dir),m=TPL.filter(x=>UK[x.id].test(u)).map(x=>x.n);$("#dt").innerHTML=m.length?"🎯 Aniqlangan yo‘nalish: <b>"+m.slice(0,3).join(", ")+"</b>":"💡 Yo‘nalish mavzu bo‘yicha ham aniqlanadi"};
 ["#un","#fc","#dr2"].forEach(q=>$(q).oninput=up);up();
-$("#nx").onclick=()=>{if(S.f.univ.trim().split(/\s+/).length<2){$("#un").focus();return}go(0)}}
+const next=event=>{event.preventDefault();if(S.f.univ.trim().split(/\s+/).length<2){$("#er").textContent="Universitetning to‘liq nomini kiriting.";$("#er").classList.add("show");$("#un").focus();return}go(0)};
+$("#nx").addEventListener("click",next);$("#nx").addEventListener("pointerup",event=>{if(event.pointerType==="touch")next(event)})}
 const PLAN={uz:["Kirish","Asosiy tushunchalar va nazariy asoslar","Hozirgi holati va tahlil","Muammolar, rivojlanish istiqbollari","Xulosa","Foydalanilgan adabiyotlar"],
 ru:["Введение","Основные понятия и теоретические основы","Современное состояние и анализ","Проблемы и перспективы развития","Заключение","Список литературы"],
 en:["Introduction","Core concepts and theoretical foundations","Current state and analysis","Challenges and future prospects","Conclusion","References"]};
@@ -137,7 +140,7 @@ else if(k==1)b=`<em>01 · ${esc(PLAN[S.lang][1])}</em><s></s><s style="width:38%
 else b=`<em class="st2" style="font-size:30px;color:${t.ac}">87%</em><small>${esc(PLAN[S.lang][2])}</small><s></s>`;
 return `<div class="sl v${t.v||0}" style="--bg2:${t.bg};--ac:${t.ac};--ff:${t.ff}">${b}</div>`}
 function head(){$("#st").innerHTML=[-1,0,1,2,3].map(i=>`<i class="${i<=S.step?'on':''}"></i>`).join("")}
-function go(n){S.step=n;draw();scrollTo({top:0,behavior:"smooth"})}
+function go(n){S.step=n;draw();window.scrollTo({top:0,behavior:"smooth"})}
 function draw(){head();([su,s0,s1,s2,s3][S.step+1])()}
 function s0(){
 $("#v").innerHTML=`<div class="sc"><div class="card"><label>1 · Mavzu</label>
