@@ -70,6 +70,8 @@ textarea{min-height:84px;resize:none}
 </div>
 <script>
 const $=q=>document.querySelector(q);
+// Telegram iOS webview ba'zan click hodisasini kechiktiradi; touch tugmani darhol ishlatadi.
+const tap=(q,fn)=>{const el=$(q);el.onclick=fn;el.addEventListener("touchend",e=>{e.preventDefault();fn(e)},{passive:false})};
 const tg=(window.Telegram&&window.Telegram.WebApp)||null;
 if(tg){try{tg.ready();tg.expand();}catch(e){}}
 const S={step:-1,all:0,topic:"",lang:"uz",pages:12,tpl:null,f:{univ:"",fac:"",dir:"",subj:"",name:"",group:"",teacher:"",city:"",year:""}};
@@ -122,7 +124,7 @@ $("#v").innerHTML=`<div class="sc"><div class="card"><div style="font-size:34px"
 <div class="note" id="dt" style="text-align:left"></div></div><button class="btn" id="nx">Davom etish →</button></div>`;
 const up=()=>{S.f.univ=$("#un").value;S.f.fac=$("#fc").value;S.f.dir=$("#dr2").value;const u=nm(S.f.univ+" "+S.f.fac+" "+S.f.dir),m=TPL.filter(x=>UK[x.id].test(u)).map(x=>x.n);$("#dt").innerHTML=m.length?"🎯 Aniqlangan yo‘nalish: <b>"+m.slice(0,3).join(", ")+"</b>":"💡 Yo‘nalish mavzu bo‘yicha ham aniqlanadi"};
 ["#un","#fc","#dr2"].forEach(q=>$(q).oninput=up);up();
-$("#nx").onclick=()=>{if(S.f.univ.trim().split(/\s+/).length<2){$("#un").focus();return}go(0)}}
+tap("#nx",()=>{if(S.f.univ.trim().split(/\s+/).length<2){$("#un").focus();return}go(0)})}
 const PLAN={uz:["Kirish","Asosiy tushunchalar va nazariy asoslar","Hozirgi holati va tahlil","Muammolar, rivojlanish istiqbollari","Xulosa","Foydalanilgan adabiyotlar"],
 ru:["Введение","Основные понятия и теоретические основы","Современное состояние и анализ","Проблемы и перспективы развития","Заключение","Список литературы"],
 en:["Introduction","Core concepts and theoretical foundations","Current state and analysis","Challenges and future prospects","Conclusion","References"]};
