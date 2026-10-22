@@ -124,8 +124,9 @@ $("#v").innerHTML=`<div class="sc"><div class="card"><div style="font-size:34px"
 <div class="note" id="dt" style="text-align:left"></div><p class="err" id="er" role="alert"></p></div><button class="btn" id="nx" type="button">Davom etish →</button></div>`;
 const up=()=>{S.f.univ=$("#un").value;S.f.fac=$("#fc").value;S.f.dir=$("#dr2").value;const u=nm(S.f.univ+" "+S.f.fac+" "+S.f.dir),m=TPL.filter(x=>UK[x.id].test(u)).map(x=>x.n);$("#dt").innerHTML=m.length?"🎯 Aniqlangan yo‘nalish: <b>"+m.slice(0,3).join(", ")+"</b>":"💡 Yo‘nalish mavzu bo‘yicha ham aniqlanadi"};
 ["#un","#fc","#dr2"].forEach(q=>$(q).oninput=up);up();
-const next=event=>{event.preventDefault();if(S.f.univ.trim().split(/\s+/).length<2){$("#er").textContent="Universitetning to‘liq nomini kiriting.";$("#er").classList.add("show");$("#un").focus();return}go(0)};
-$("#nx").addEventListener("click",next);$("#nx").addEventListener("pointerup",event=>{if(event.pointerType==="touch")next(event)})}
+let isAdvancing=false;
+const next=event=>{event.preventDefault();if(isAdvancing)return;if(S.f.univ.trim().split(/\s+/).length<2){$("#er").textContent="Universitetning to‘liq nomini kiriting.";$("#er").classList.add("show");$("#un").focus();return}isAdvancing=true;go(0)};
+$("#nx").addEventListener("click",next);$("#nx").addEventListener("touchend",next,{passive:false})}
 const PLAN={uz:["Kirish","Asosiy tushunchalar va nazariy asoslar","Hozirgi holati va tahlil","Muammolar, rivojlanish istiqbollari","Xulosa","Foydalanilgan adabiyotlar"],
 ru:["Введение","Основные понятия и теоретические основы","Современное состояние и анализ","Проблемы и перспективы развития","Заключение","Список литературы"],
 en:["Introduction","Core concepts and theoretical foundations","Current state and analysis","Challenges and future prospects","Conclusion","References"]};
